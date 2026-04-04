@@ -9,6 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -16,7 +17,7 @@
             background: #f0f2f5;
             color: #333;
             min-height: 100vh;
-            padding: 0;
+            min-height: 100dvh;
         }
 
         /* Login page */
@@ -25,7 +26,9 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            min-height: 100dvh;
             background: #1a1a2e;
+            padding: 20px;
         }
 
         .login-page.hidden {
@@ -34,8 +37,8 @@
 
         .login-box {
             background: white;
-            border-radius: 10px;
-            padding: 40px;
+            border-radius: 14px;
+            padding: 32px 24px;
             width: 100%;
             max-width: 380px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.3);
@@ -45,19 +48,19 @@
             text-align: center;
             margin-bottom: 6px;
             color: #1a1a2e;
-            font-size: 22px;
+            font-size: 24px;
         }
 
         .login-box .login-sub {
             text-align: center;
             color: #888;
-            font-size: 13px;
+            font-size: 15px;
             margin-bottom: 28px;
         }
 
         .login-box label {
             display: block;
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 600;
             color: #555;
             margin-bottom: 6px;
@@ -65,13 +68,14 @@
 
         .login-box input {
             width: 100%;
-            padding: 10px 14px;
+            padding: 14px 16px;
             border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 16px;
             margin-bottom: 18px;
             outline: none;
             transition: border-color 0.2s;
+            appearance: none;
         }
 
         .login-box input:focus {
@@ -80,12 +84,12 @@
 
         .login-btn {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             background: #27ae60;
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 15px;
+            border-radius: 8px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
@@ -98,27 +102,23 @@
         /* Dashboard */
         .dashboard {
             display: none;
-            padding: 30px 20px;
+            padding: 14px 10px;
+            padding-bottom: 30px;
         }
 
         .dashboard.visible {
             display: block;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 14px;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 18px;
             font-weight: 700;
             color: #1a1a2e;
         }
@@ -127,10 +127,10 @@
             background: #e74c3c;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 10px 18px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 500;
             transition: background 0.2s;
         }
@@ -140,25 +140,24 @@
         }
 
         .cards {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .card {
             background: white;
-            border-radius: 10px;
-            padding: 24px;
+            border-radius: 14px;
+            padding: 14px 14px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             cursor: pointer;
             transition: box-shadow 0.2s, transform 0.15s;
             border: 2px solid transparent;
         }
 
-        .card:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-            transform: translateY(-2px);
+        .card:active {
+            transform: scale(0.98);
         }
 
         .card.active {
@@ -166,32 +165,33 @@
         }
 
         .card-label {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: #888;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .card-amount {
-            font-size: 36px;
+            font-size: 42px;
             font-weight: 700;
             color: #27ae60;
         }
 
         .card-sub {
-            font-size: 13px;
+            font-size: 14px;
             color: #aaa;
-            margin-top: 6px;
+            margin-top: 3px;
         }
 
         .breakdown {
             background: white;
-            border-radius: 10px;
+            border-radius: 14px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             overflow: hidden;
             display: none;
+            margin-bottom: 10px;
         }
 
         .breakdown.visible {
@@ -201,7 +201,7 @@
         .breakdown-header {
             background: #2c3e50;
             color: white;
-            padding: 14px 20px;
+            padding: 12px 14px;
             font-size: 16px;
             font-weight: 600;
         }
@@ -217,7 +217,7 @@
         }
 
         .breakdown-table th {
-            padding: 10px 20px;
+            padding: 10px 12px;
             text-align: left;
             font-size: 13px;
             font-weight: 600;
@@ -225,68 +225,105 @@
             letter-spacing: 0.5px;
         }
 
-        .breakdown-table th:nth-child(2),
+        .breakdown-table th:nth-child(2) {
+            text-align: right;
+        }
+
         .breakdown-table th:nth-child(3) {
             text-align: right;
         }
 
         .breakdown-table td {
-            padding: 12px 20px;
+            padding: 8px 12px;
             border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
+            font-size: 20px;
+        }
+
+        .breakdown-table td:nth-child(1) {
+            font-weight: 500;
         }
 
         .breakdown-table td:nth-child(2) {
             text-align: right;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 26px;
             color: #27ae60;
         }
 
         .breakdown-table td:nth-child(3) {
             text-align: right;
-            width: 120px;
+            width: 90px;
         }
 
         .breakdown-table tr:last-child td {
             border-bottom: none;
         }
 
-        .breakdown-table tr:hover {
-            background: #f8f9fa;
-        }
-
         .trend-bar-container {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            height: 16px;
+            height: 18px;
         }
 
         .trend-bar {
-            height: 14px;
+            height: 16px;
             background: linear-gradient(90deg, #27ae60, #2ecc71);
-            border-radius: 2px;
+            border-radius: 3px;
             min-width: 4px;
         }
 
         .total-row td {
             font-weight: 700 !important;
             border-top: 2px solid #2c3e50;
-            font-size: 15px !important;
+            font-size: 26px !important;
             background: #f8f9fa;
         }
 
-        @media (max-width: 600px) {
-            .cards {
-                grid-template-columns: 1fr;
+        /* Desktop overrides */
+        @media (min-width: 768px) {
+            .dashboard {
+                padding: 30px 20px;
             }
-            .card-amount {
+
+            .header h1 {
                 font-size: 28px;
             }
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
+
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .cards {
+                flex-direction: row;
+                gap: 20px;
+            }
+
+            .card {
+                flex: 1;
+                padding: 24px;
+            }
+
+            .card:hover {
+                box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+                transform: translateY(-2px);
+            }
+
+            .card:active {
+                transform: translateY(-2px);
+            }
+
+            .card-amount {
+                font-size: 36px;
+            }
+
+            .breakdown-table th {
+                padding: 10px 20px;
+            }
+
+            .breakdown-table td {
+                padding: 12px 20px;
             }
         }
     </style>
@@ -317,12 +354,12 @@
             <div class="card" id="daily-card" onclick="toggleBreakdown('daily')">
                 <div class="card-label">Daily Income Snapshot</div>
                 <div class="card-amount" id="daily-total"></div>
-                <div class="card-sub">Today's earnings — click for details</div>
+                <div class="card-sub">Today's earnings — tap for details</div>
             </div>
             <div class="card" id="weekly-card" onclick="toggleBreakdown('weekly')">
                 <div class="card-label">Weekly Income Snapshot</div>
                 <div class="card-amount" id="weekly-total"></div>
-                <div class="card-sub">This week's earnings — click for details</div>
+                <div class="card-sub">This week's earnings — tap for details</div>
             </div>
         </div>
 
@@ -340,7 +377,7 @@
             <div class="breakdown-header">Weekly Sales Snapshot</div>
             <table class="breakdown-table">
                 <thead>
-                    <tr><th>Week Ending</th><th>Gross Sales</th><th>Trend</th></tr>
+                    <tr><th>Week Ending</th><th>Gross</th><th>Trend</th></tr>
                 </thead>
                 <tbody id="weekly-body"></tbody>
             </table>
@@ -358,16 +395,14 @@
         const STORAGE_KEY = 'earnings_dashboard_data';
 
         function generateWeightedAmount() {
-            // Mix of distributions for real variety:
-            // 30% chance of low ($300-$450), 40% chance of mid ($400-$700), 30% chance of high ($700-$1100)
             const roll = Math.random();
             let amount;
             if (roll < 0.3) {
-                amount = 300 + Math.random() * 150; // $300-$450
+                amount = 300 + Math.random() * 150;
             } else if (roll < 0.7) {
-                amount = 400 + Math.random() * 300; // $400-$700
+                amount = 400 + Math.random() * 300;
             } else {
-                amount = 700 + Math.random() * 400; // $700-$1100
+                amount = 700 + Math.random() * 400;
             }
             return Math.round(amount * 100) / 100;
         }
@@ -376,13 +411,11 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            // Generate 28 days of data (4 weeks) with upward trend
             const dailyAmounts = [];
             for (let i = 27; i >= 0; i--) {
                 const date = new Date(today);
                 date.setDate(date.getDate() - i);
 
-                // Trend multiplier: oldest day ~0.75, newest day ~1.25
                 const trendFactor = 0.75 + (27 - i) * (0.5 / 27);
                 let amount = generateWeightedAmount() * trendFactor;
                 amount = Math.max(300, Math.min(1100, Math.round(amount * 100) / 100));
@@ -393,10 +426,8 @@
                 });
             }
 
-            // Last 7 days for daily snapshot
             const daily = dailyAmounts.slice(-7);
 
-            // 4 weeks for weekly snapshot
             const weekly = [];
             for (let w = 0; w < 4; w++) {
                 const weekDays = dailyAmounts.slice(w * 7, (w + 1) * 7);
@@ -431,7 +462,7 @@
             const d = new Date(dateStr + 'T12:00:00');
             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return `${days[d.getDay()]}    ${months[d.getMonth()]}${d.getDate()}`;
+            return `${days[d.getDay()]}  ${months[d.getMonth()]} ${d.getDate()}`;
         }
 
         function formatWeekDate(dateStr) {
@@ -440,15 +471,12 @@
         }
 
         function render(data) {
-            // Today's earnings (last item in daily)
             const todayAmount = data.daily[data.daily.length - 1].amount;
             document.getElementById('daily-total').textContent = formatCurrency(todayAmount);
 
-            // This week's earnings (last item in weekly)
             const thisWeekAmount = data.weekly[data.weekly.length - 1].amount;
             document.getElementById('weekly-total').textContent = formatCurrency(thisWeekAmount);
 
-            // Daily breakdown - show most recent first
             const dailyBody = document.getElementById('daily-body');
             const dailyMax = Math.max(...data.daily.map(d => d.amount));
             const dailyTotal = data.daily.reduce((sum, d) => sum + d.amount, 0);
@@ -470,7 +498,6 @@
             </tr>`;
             dailyBody.innerHTML = dailyHTML;
 
-            // Weekly breakdown - show most recent first
             const weeklyBody = document.getElementById('weekly-body');
             const weeklyMax = Math.max(...data.weekly.map(w => w.amount));
             const weeklyTotal = data.weekly.reduce((sum, w) => sum + w.amount, 0);
@@ -480,7 +507,7 @@
                 const w = data.weekly[i];
                 const barWidth = Math.round((w.amount / weeklyMax) * 100);
                 const label = i === data.weekly.length - 1
-                    ? `${formatWeekDate(w.endDate)}    (current week)`
+                    ? `${formatWeekDate(w.endDate)} (current)`
                     : formatWeekDate(w.endDate);
                 weeklyHTML += `<tr>
                     <td>${label}</td>
@@ -526,7 +553,6 @@
             render(data);
         }
 
-        // Init
         const data = loadData();
         render(data);
     </script>
