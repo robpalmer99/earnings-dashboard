@@ -1,0 +1,25 @@
+:root {
+  --accent: #16a34a;
+  --accent-soft: rgba(22, 163, 74, 0.12);
+  --accent-contrast: #ffffff;
+  --font: 'Inter', system-ui, sans-serif;
+  --radius: 14px;
+
+  --bg: #f6f7f5;
+  --surface: #ffffff;
+  --ink: #16201a;
+  --ink-soft: #52605a;
+  --ink-mute: #9aa39b;
+  --line: #e4e8e3;
+  --line-soft: #f0f3f0;
+}
+
+:root[data-base='dark'] {
+  --bg: #0f1311;
+  --surface: #171c19;
+  --ink: #f3f6f4;
+  --ink-soft: #b3beb8;
+  --ink-mute: #76837b;
+  --line: #283029;
+  --line-soft: #1d231f;
+}
