@@ -13,7 +13,7 @@ export function mount(root, store) {
       el('div', {}, 'Date'), el('div', { class: 'amt' }, 'Gross'), el('div', {}, 'Trend')));
 
     const rows = data.daily.slice(-7).reverse();
-    const max = Math.max(...rows.map((r) => r.amount));
+    const max = Math.max(1, ...rows.map((r) => r.amount));
     let total = 0;
     for (const r of rows) {
       total += r.amount;

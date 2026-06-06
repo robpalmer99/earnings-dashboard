@@ -14,6 +14,7 @@ export function mount(root, store) {
     if (timer) { clearTimeout(timer); timer = null; }
   }
   function open() {
+    if (timer) { clearTimeout(timer); timer = null; }
     const { config, data } = store.getState();
     machine = createWithdrawMachine({ balance: data.balance, presets: config.withdraw.presets });
     overlay.classList.remove('hidden');
@@ -26,7 +27,7 @@ export function mount(root, store) {
   function stepper(current) {
     const idx = STEPS.indexOf(current);
     const row = el('div', { class: 'wd-stepper' });
-    STEPS.forEach((s, i) => {
+    STEPS.forEach((_, i) => {
       const cls = i < idx ? 'done' : i === idx ? 'active' : 'todo';
       row.append(el('div', { class: 'wd-node ' + cls }, i < idx ? '✓' : String(i + 1)));
       if (i < STEPS.length - 1) row.append(el('div', { class: 'wd-seg' + (i < idx ? ' done' : '') }));
@@ -82,5 +83,5 @@ export function mount(root, store) {
     }
   }
 
-  return { destroy: () => { document.removeEventListener('withdraw:open', open); overlay.remove(); } };
+  return { destroy: () => { document.removeEventListener('withdraw:open', open); if (timer) { clearTimeout(timer); timer = null; } overlay.remove(); } };
 }
