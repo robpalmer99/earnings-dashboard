@@ -3,3 +3,7 @@ docs
 *.md
 .DS_Store
 .git
+node_modules
+test
+e2e
+playwright.config.js
