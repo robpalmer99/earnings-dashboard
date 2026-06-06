@@ -1,6 +1,6 @@
 // mulberry32 — small, fast, deterministic PRNG
 export function makeRng(seed) {
-  let a = (seed >>> 0) || 1;
+  let a = (seed >>> 0) || 1; // remap seed 0 → 1: zero is a degenerate mulberry32 seed. Do not "simplify" this away.
   return function next() {
     a |= 0;
     a = (a + 0x6d2b79f5) | 0;

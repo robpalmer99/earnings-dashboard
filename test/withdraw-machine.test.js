@@ -66,3 +66,11 @@ test('complete state exposes a reference id', () => {
   m.setAmount(1500); m.next(); m.next(); m.next();
   assert.match(m.getState().reference, /^[A-Z0-9-]{4,}$/);
 });
+
+test('back() is a no-op from the terminal complete step', () => {
+  const m = createWithdrawMachine(opts);
+  m.setAmount(1500); m.next(); m.next(); m.next();
+  assert.equal(m.getState().step, 'complete');
+  m.back();
+  assert.equal(m.getState().step, 'complete');
+});

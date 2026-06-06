@@ -30,3 +30,10 @@ test('flat series does not divide by zero', () => {
   const { points } = buildChart([{ amount: 5 }, { amount: 5 }], box);
   assert.ok(points.every((p) => Number.isFinite(p.y)));
 });
+
+test('empty series returns empty geometry without throwing', () => {
+  const { points, linePath, areaPath } = buildChart([], box);
+  assert.deepEqual(points, []);
+  assert.equal(linePath, '');
+  assert.equal(areaPath, '');
+});

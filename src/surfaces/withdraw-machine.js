@@ -31,6 +31,7 @@ export function createWithdrawMachine({ balance, presets = [500, 1000, 1500] }) 
       if (i < STEPS.length - 1) setStep(STEPS[i + 1]);
     },
     back() {
+      if (state.step === 'complete') return; // terminal: no navigating back once a transfer is submitted
       const i = STEPS.indexOf(state.step);
       if (i > 0) setStep(STEPS[i - 1]);
     },

@@ -1,4 +1,5 @@
 export function buildChart(series, { width, height, padding = 8 }) {
+  if (!series.length) return { points: [], linePath: '', areaPath: '', min: 0, max: 0 };
   const values = series.map((d) => d.amount);
   const min = Math.min(...values);
   const max = Math.max(...values);
