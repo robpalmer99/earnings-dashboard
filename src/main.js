@@ -1,6 +1,6 @@
 import { createStore } from './store.js';
 import { loadConfig, saveConfig } from './config/persistence.js';
-import { mergeConfig } from './config/schema.js';
+import { mergeConfig, defaultConfig } from './config/schema.js';
 import { generateEarnings } from './data/earnings-engine.js';
 import { applyTheme } from './theme/apply-theme.js';
 import { el, clear } from './lib/dom.js';
@@ -26,6 +26,13 @@ const controller = {
     applyTheme(config);
     saveConfig(config);
     store.setState(build(config));
+  },
+  // True reset: set the default config directly (not a merge), so stray keys from a
+  // previously imported config can't survive a reset.
+  resetConfig() {
+    applyTheme(defaultConfig);
+    saveConfig(defaultConfig);
+    store.setState(build(defaultConfig));
   },
 };
 

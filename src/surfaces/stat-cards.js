@@ -13,7 +13,7 @@ export function mount(root, store) {
   const wrap = el('div', { class: 'cards' });
   root.append(wrap);
 
-  function render() {
+  function render(animate = false) {
     const { config, data } = store.getState();
     wrap.classList.toggle('hidden', !config.surfaces.statCards);
     clear(wrap);
@@ -26,11 +26,13 @@ export function mount(root, store) {
         : el('div', { class: 'delta' }, def.key === 'total' ? 'all-time' : '');
       wrap.append(el('div', { class: 'card' + (def.hero ? ' hero' : '') },
         el('div', { class: 'label' }, def.label), amountEl, delta));
-      countUp(amountEl, t.amount, { duration: 900, format: (n) => formatCurrency(n, config.locale) });
+      // amountEl already shows the final value; only animate (count-up from 0) on the
+      // initial mount, not on every store update (e.g. each control-panel keystroke).
+      if (animate) countUp(amountEl, t.amount, { duration: 900, format: (n) => formatCurrency(n, config.locale) });
     }
   }
 
-  const off = store.subscribe(render);
-  render();
+  const off = store.subscribe(() => render(false));
+  render(true);
   return { destroy: () => { off(); wrap.remove(); } };
 }

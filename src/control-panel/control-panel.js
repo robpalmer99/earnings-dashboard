@@ -1,6 +1,5 @@
 import { el, clear } from '../lib/dom.js';
 import { presets } from '../config/presets.js';
-import { defaultConfig } from '../config/schema.js';
 import { exportConfig, importConfig } from '../config/persistence.js';
 
 export function mount(root, controller) {
@@ -26,7 +25,11 @@ export function mount(root, controller) {
     return el('input', { class: 'cp-inp', value, onInput: (e) => controller.setConfig(patch(path, e.target.value)) });
   }
   function number(path, value, step = 1) {
-    return el('input', { class: 'cp-inp', type: 'number', step, value, onInput: (e) => controller.setConfig(patch(path, Number(e.target.value))) });
+    return el('input', { class: 'cp-inp', type: 'number', step, value, onInput: (e) => {
+      if (e.target.value === '') return; // don't slam to 0 mid-edit while the field is empty
+      const n = Number(e.target.value);
+      if (Number.isFinite(n)) controller.setConfig(patch(path, n));
+    } });
   }
   function range(path, value, min, max, step) {
     return el('input', { class: 'cp-inp', type: 'range', min, max, step, value, onInput: (e) => controller.setConfig(patch(path, Number(e.target.value))) });
@@ -92,13 +95,13 @@ export function mount(root, controller) {
     body.append(el('div', { class: 'cp-actions' },
       el('button', { class: 'cp-btn', onClick: doExport }, 'Export'),
       el('button', { class: 'cp-btn', onClick: doImport }, 'Import'),
-      el('button', { class: 'cp-btn', onClick: () => { controller.setConfig(defaultConfig); rebuild(); } }, 'Reset')));
+      el('button', { class: 'cp-btn', onClick: () => { controller.resetConfig(); rebuild(); } }, 'Reset')));
   }
 
   function doExport() {
     const blob = new Blob([exportConfig(controller.getConfig())], { type: 'application/json' });
     const a = el('a', { href: URL.createObjectURL(blob), download: 'dashboard-config.json' });
-    document.body.append(a); a.click(); a.remove();
+    document.body.append(a); a.click(); URL.revokeObjectURL(a.href); a.remove();
   }
   function doImport() {
     const input = el('input', { type: 'file', accept: 'application/json' });
