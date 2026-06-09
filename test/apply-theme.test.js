@@ -31,3 +31,13 @@ test('derives a soft accent tint custom property', () => {
   applyTheme(defaultConfig, t);
   assert.ok(t.props['--accent-soft']);
 });
+
+test('picks black ink on a bright accent and white on a dark one', () => {
+  const bright = fakeTarget();
+  applyTheme({ ...defaultConfig, theme: { ...defaultConfig.theme, accent: '#ffd014' } }, bright);
+  assert.equal(bright.props['--accent-contrast'], '#000000');
+
+  const dark = fakeTarget();
+  applyTheme({ ...defaultConfig, theme: { ...defaultConfig.theme, accent: '#15448f' } }, dark);
+  assert.equal(dark.props['--accent-contrast'], '#ffffff');
+});
