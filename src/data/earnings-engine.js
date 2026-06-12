@@ -6,8 +6,13 @@ export const MASTER_DAYS = 180;
 const round2 = (n) => Math.round(n * 100) / 100;
 const sum = (arr) => arr.reduce((s, d) => s + d.amount, 0);
 
+function isWeekend(dateStr) {
+  const dow = new Date(dateStr + 'T00:00:00Z').getUTCDay();
+  return dow === 0 || dow === 6;
+}
+
 function generateDaily(rng, config, now) {
-  const { dailyMin, dailyMax, trend, volatility } = config.data;
+  const { dailyMin, dailyMax, trend, volatility, weekendDip } = config.data;
   const days = [];
   for (let i = MASTER_DAYS - 1; i >= 0; i--) {
     const date = addDays(now, -i);
@@ -17,7 +22,9 @@ function generateDaily(rng, config, now) {
     const noise = 1 + (rng() - 0.5) * 2 * volatility;
     let amount = base * trendFactor * noise;
     amount = Math.max(dailyMin, Math.min(dailyMax * 1.5, amount));
-    days.push({ date, amount: round2(amount) });
+    amount = round2(amount);
+    if (weekendDip && isWeekend(date)) amount = round2(amount * 0.6);
+    days.push({ date, amount });
   }
   return days;
 }

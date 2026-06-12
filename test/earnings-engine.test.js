@@ -83,3 +83,17 @@ test('weekly and monthly aggregates exist', () => {
   assert.ok(weekly[0].startDate && weekly[0].endDate);
   assert.match(monthly[0].month, /^\d{4}-\d{2}$/);
 });
+
+test('weekendDip scales Sat/Sun down vs neighbors', () => {
+  const dipCfg = { data: { ...config.data, weekendDip: true } };
+  const a = generateEarnings(config, NOW);
+  const b = generateEarnings(dipCfg, NOW);
+  for (let i = 0; i < b.daily.length; i++) {
+    const dow = new Date(b.daily[i].date + 'T00:00:00Z').getUTCDay();
+    if (dow === 0 || dow === 6) {
+      assert.equal(b.daily[i].amount, Math.round(a.daily[i].amount * 0.6 * 100) / 100);
+    } else {
+      assert.equal(b.daily[i].amount, a.daily[i].amount);
+    }
+  }
+});
