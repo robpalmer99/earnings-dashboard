@@ -12,6 +12,7 @@ import * as recentPayouts from './surfaces/recent-payouts.js';
 import * as earningsGraph from './surfaces/earnings-graph.js';
 import * as breakdownTables from './surfaces/breakdown-tables.js';
 import * as withdrawFlow from './surfaces/withdraw-flow.js';
+import * as tabBar from './surfaces/tab-bar.js';
 import * as controlPanel from './control-panel/control-panel.js';
 
 const today = isoDate(new Date());
@@ -62,3 +63,4 @@ earningsGraph.mount(surfaces, store);
 breakdownTables.mount(surfaces, store);
 withdrawFlow.mount(document.getElementById('overlays'), store);
 controlPanel.mount(document.getElementById('panel-root'), controller);
+tabBar.mount(document.body, store);
