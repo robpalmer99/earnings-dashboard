@@ -58,3 +58,15 @@
 .tables .bar-wrap { display: flex; justify-content: flex-end; }
 .tables .bar { height: 7px; border-radius: 999px; background: var(--accent); }
 .tables .row.total { font-weight: 800; background: var(--line-soft); }
+
+/* Recent payouts */
+.payouts { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 16px 10px; margin-bottom: 14px; }
+.payouts .p-head { font-size: 13px; font-weight: 700; padding: 10px 0 6px; }
+.payouts .p-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line-soft); }
+.payouts .p-ico { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; }
+.payouts .p-main { flex: 1; min-width: 0; }
+.payouts .p-date { font-size: 13px; font-weight: 600; }
+.payouts .p-sub { font-size: 11px; color: var(--ink-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.payouts .p-right { text-align: right; }
+.payouts .p-amt { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.payouts .p-badge { font-size: 10px; font-weight: 700; color: var(--accent); }
