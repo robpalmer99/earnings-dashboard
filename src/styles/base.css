@@ -32,3 +32,5 @@ body {
 @media (min-width: 720px) { .page-title { font-size: 28px; } }
 
 .hidden { display: none !important; }
+
+.icon { display: inline-block; vertical-align: -2px; flex-shrink: 0; }
