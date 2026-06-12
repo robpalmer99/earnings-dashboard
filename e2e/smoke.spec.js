@@ -27,5 +27,5 @@ test('withdraw flow reaches completion', async ({ page }) => {
   await page.locator('.wd-chip', { hasText: 'Max' }).click();
   await page.locator('.btn-accent', { hasText: 'Continue' }).click();
   await page.locator('.btn-accent', { hasText: 'Confirm withdrawal' }).click();
-  await expect(page.locator('.wd-h', { hasText: 'Transfer initiated!' })).toBeVisible({ timeout: 8000 });
+  await expect(page.locator('.wd-h', { hasText: 'Transfer complete!' })).toBeVisible({ timeout: 8000 });
 });
