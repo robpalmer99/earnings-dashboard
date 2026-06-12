@@ -23,3 +23,11 @@ test('surfaces default all visible', () => {
   assert.equal(defaultConfig.surfaces.balance, true);
   assert.equal(defaultConfig.surfaces.tables, true);
 });
+
+test('camera-realism defaults present', () => {
+  assert.equal(defaultConfig.data.forcePositiveDeltas, true);
+  assert.equal(defaultConfig.data.weekendDip, false);
+  assert.equal(defaultConfig.surfaces.payouts, true);
+  assert.equal(defaultConfig.surfaces.tabBar, true);
+  assert.equal(defaultConfig.payouts.count, 4);
+});

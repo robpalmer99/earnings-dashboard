@@ -23,17 +23,24 @@ export const defaultConfig = {
     seed: 42,
     balance: 4401.86,
     todayDeltaOverride: 27.3,
+    forcePositiveDeltas: true,
+    weekendDip: false,
   },
   surfaces: {
     statCards: true,
     graph: true,
     balance: true,
     tables: true,
+    payouts: true,
+    tabBar: true,
   },
   withdraw: {
     bank: 'Bank of America ••4471',
     presets: [500, 1000, 1500],
     processingMs: 2600,
+  },
+  payouts: {
+    count: 4,
   },
 };
 
