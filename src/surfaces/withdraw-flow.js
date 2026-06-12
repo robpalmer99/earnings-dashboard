@@ -9,13 +9,16 @@ export function mount(root, store) {
   root.append(overlay);
   let machine = null;
   let timer = null;
+  let settled = false;
 
   function close() {
+    settle();
     overlay.classList.add('hidden');
     if (timer) { clearTimeout(timer); timer = null; }
   }
   function open() {
     if (timer) { clearTimeout(timer); timer = null; }
+    settled = false;
     const { config, data } = store.getState();
     machine = createWithdrawMachine({ balance: data.balance, presets: config.withdraw.presets });
     overlay.classList.remove('hidden');
@@ -24,6 +27,19 @@ export function mount(root, store) {
 
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
   document.addEventListener('withdraw:open', open);
+
+  // Runtime-only continuity: balance drops and a payout row appears for the rest
+  // of the session; reload restores the configured balance (zero-cleanup retakes).
+  function settle() {
+    if (settled || !machine) return;
+    const st = machine.getState();
+    if (st.step !== 'complete') return;
+    settled = true;
+    store.setState((s) => ({
+      data: { ...s.data, balance: Math.round((s.data.balance - st.amount) * 100) / 100 },
+      session: { payouts: [{ date: 'now', amount: st.amount, status: 'Completed' }, ...(s.session?.payouts || [])] },
+    }));
+  }
 
   function stepper(current) {
     const idx = STEPS.indexOf(current);

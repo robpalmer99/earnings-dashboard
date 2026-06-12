@@ -31,3 +31,18 @@ test('unsubscribe stops notifications', () => {
   s.setState({ count: 2 });
   assert.equal(calls, 1);
 });
+
+test('functional setState supports runtime balance decrement + session payout', () => {
+  const store = createStore({
+    config: {},
+    data: { balance: 4401.86 },
+    session: { payouts: [] },
+  });
+  const amount = 750;
+  store.setState((s) => ({
+    data: { ...s.data, balance: Math.round((s.data.balance - amount) * 100) / 100 },
+    session: { payouts: [{ date: 'now', amount, status: 'Completed' }, ...s.session.payouts] },
+  }));
+  assert.equal(store.getState().data.balance, 3651.86);
+  assert.equal(store.getState().session.payouts[0].date, 'now');
+});

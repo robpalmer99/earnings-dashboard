@@ -15,7 +15,7 @@ import * as controlPanel from './control-panel/control-panel.js';
 const today = isoDate(new Date());
 const build = (config) => ({ config, data: generateEarnings(config, today) });
 
-const store = createStore(build(loadConfig()));
+const store = createStore({ ...build(loadConfig()), session: { payouts: [] } });
 applyTheme(store.getState().config);
 
 const controller = {
