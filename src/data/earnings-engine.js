@@ -1,16 +1,17 @@
 import { makeRng } from '../lib/rng.js';
 import { addDays, monthKey } from '../lib/dates.js';
 
+export const MASTER_DAYS = 180;
+
 const round2 = (n) => Math.round(n * 100) / 100;
 const sum = (arr) => arr.reduce((s, d) => s + d.amount, 0);
 
-function generateDaily(config, now) {
-  const { dailyMin, dailyMax, trend, volatility, windowDays, seed } = config.data;
-  const rng = makeRng(seed);
+function generateDaily(rng, config, now) {
+  const { dailyMin, dailyMax, trend, volatility } = config.data;
   const days = [];
-  for (let i = windowDays - 1; i >= 0; i--) {
+  for (let i = MASTER_DAYS - 1; i >= 0; i--) {
     const date = addDays(now, -i);
-    const progress = windowDays > 1 ? (windowDays - 1 - i) / (windowDays - 1) : 1;
+    const progress = (MASTER_DAYS - 1 - i) / (MASTER_DAYS - 1);
     const trendFactor = 1 + trend * (progress - 0.5);
     const base = dailyMin + rng() * (dailyMax - dailyMin);
     const noise = 1 + (rng() - 0.5) * 2 * volatility;
@@ -35,12 +36,16 @@ function aggregateWeekly(daily) {
 }
 
 function aggregateMonthly(daily) {
-  const byMonth = new Map();
-  for (const d of daily) {
-    const k = monthKey(d.date);
-    byMonth.set(k, (byMonth.get(k) || 0) + d.amount);
+  // Six complete trailing 30-day buckets ending today. Complete buckets only —
+  // the calendar-month "partial month crash" is structurally impossible.
+  const buckets = [];
+  for (let k = 5; k >= 0; k--) {
+    const end = daily.length - k * 30;
+    const slice = daily.slice(end - 30, end);
+    const endDate = slice[slice.length - 1].date;
+    buckets.push({ month: monthKey(endDate), endDate, amount: round2(sum(slice)) });
   }
-  return [...byMonth.entries()].map(([month, amount]) => ({ month, amount: round2(amount) }));
+  return buckets;
 }
 
 function pctDelta(current, previous) {
@@ -50,6 +55,7 @@ function pctDelta(current, previous) {
 
 function computeTotals(daily, config) {
   const n = daily.length;
+  const windowDays = Math.min(config.data.windowDays || n, n);
   const today = daily[n - 1].amount;
   const yesterday = n >= 2 ? daily[n - 2].amount : null;
 
@@ -64,15 +70,16 @@ function computeTotals(daily, config) {
     today: { amount: round2(today), deltaPct: override != null ? override : pctDelta(today, yesterday) },
     week: { amount: round2(last7), deltaPct: pctDelta(last7, prev7) },
     month: { amount: round2(last30), deltaPct: pctDelta(last30, prev30) },
-    total: { amount: round2(sum(daily)) },
+    total: { amount: round2(sum(daily.slice(-windowDays))) },
   };
 }
 
 export function generateEarnings(config, now) {
-  const daily = generateDaily(config, now);
+  const rng = makeRng(config.data.seed);
+  const daily = generateDaily(rng, config, now);
   return {
     daily,
-    weekly: aggregateWeekly(daily),
+    weekly: aggregateWeekly(daily.slice(-56)),
     monthly: aggregateMonthly(daily),
     totals: computeTotals(daily, config),
     balance: config.data.balance,

@@ -19,11 +19,32 @@ test('changing the seed changes the series', () => {
   assert.notDeepEqual(a.daily, b.daily);
 });
 
-test('daily series has windowDays entries ending today', () => {
+test('daily master series has 180 entries ending today', () => {
   const { daily } = generateEarnings(config, NOW);
-  assert.equal(daily.length, 60);
+  assert.equal(daily.length, 180);
   assert.equal(daily[daily.length - 1].date, '2026-06-06');
-  assert.equal(daily[0].date, '2026-04-08');
+});
+
+test('monthly is six complete trailing 30-day buckets', () => {
+  const { daily, monthly } = generateEarnings(config, NOW);
+  assert.equal(monthly.length, 6);
+  const last30 = daily.slice(-30).reduce((s, d) => s + d.amount, 0);
+  assert.equal(monthly[5].amount, Math.round(last30 * 100) / 100);
+  assert.equal(monthly[5].endDate, '2026-06-06');
+  assert.equal(monthly[5].month, '2026-06');
+  assert.equal(monthly[0].endDate, '2026-01-07');
+});
+
+test('weekly is the last 8 complete weeks', () => {
+  const { weekly } = generateEarnings(config, NOW);
+  assert.equal(weekly.length, 8);
+  assert.equal(weekly[7].endDate, '2026-06-06');
+});
+
+test('total card sums only the configured window', () => {
+  const { daily, totals } = generateEarnings(config, NOW);
+  const win = daily.slice(-60).reduce((s, d) => s + d.amount, 0);
+  assert.equal(totals.total.amount, Math.round(win * 100) / 100);
 });
 
 test('amounts stay within sane bounds', () => {
