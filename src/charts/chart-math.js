@@ -45,6 +45,7 @@ function smoothLine(points) {
 }
 
 export function resample(values, n) {
+  if (n < 2) return values.length ? [values[0]] : [];
   if (values.length === n) return [...values];
   if (values.length === 1) return Array(n).fill(values[0]);
   const out = [];

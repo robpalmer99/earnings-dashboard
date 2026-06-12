@@ -1,5 +1,6 @@
 import { el, clear } from '../lib/dom.js';
 import { createLineChart } from '../charts/line-chart.js';
+import { formatCurrency } from '../lib/format.js';
 
 const PERIODS = [
   { key: 'daily', label: 'Daily', title: 'Daily Earnings — Last 30 Days' },
@@ -27,17 +28,20 @@ export function mount(root, store) {
     for (const p of PERIODS) {
       toggle.append(el('button', {
         class: p.key === active ? 'on' : '',
-        onClick: () => { active = p.key; render(true); },
+        onClick: () => { active = p.key; render(true, true); },
       }, p.label));
     }
   }
 
-  function render(animate = true) {
+  function render(animate = true, morph = false) {
     const { config, data } = store.getState();
     card.classList.toggle('hidden', !config.surfaces.graph);
     titleEl.textContent = PERIODS.find((p) => p.key === active).title;
     renderToggle();
-    chart.render(seriesFor(active, data), { animate });
+    chart.render(seriesFor(active, data), {
+      animate, morph,
+      format: (n) => formatCurrency(n, config.locale),
+    });
   }
 
   const off = store.subscribe(() => render(false));
