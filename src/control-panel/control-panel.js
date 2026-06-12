@@ -6,7 +6,7 @@ export function mount(root, controller) {
   const body = el('div', { class: 'cp-body' });
   const drawer = el('aside', { class: 'cp-drawer' },
     el('div', { class: 'cp-head' },
-      el('h4', {}, '⚙ Setup'),
+      el('h4', {}, 'Setup'),
       el('span', { class: 'cp-kbd' }, '⌘K to hide')),
     body);
   root.append(drawer);
@@ -81,16 +81,20 @@ export function mount(root, controller) {
       field('Window (days)', number('data.windowDays', c.data.windowDays, 1)),
       field('Seed', number('data.seed', c.data.seed, 1)),
       field('Available balance', number('data.balance', c.data.balance, 1)),
-      field('Hero "Today" %', number('data.todayDeltaOverride', c.data.todayDeltaOverride, 0.1)));
+      field('Hero "Today" %', number('data.todayDeltaOverride', c.data.todayDeltaOverride, 0.1)),
+      field('Always-positive deltas', checkbox('data.forcePositiveDeltas', c.data.forcePositiveDeltas)),
+      field('Weekend dip', checkbox('data.weekendDip', c.data.weekendDip)));
 
     body.append(section('Withdraw'),
       field('Bank label', text('withdraw.bank', c.withdraw.bank)),
-      field('Processing (ms)', number('withdraw.processingMs', c.withdraw.processingMs, 100)));
+      field('Processing (ms)', number('withdraw.processingMs', c.withdraw.processingMs, 100)),
+      field('Payout history rows', number('payouts.count', c.payouts.count, 1)));
 
     const surf = (k, l) => el('label', { class: 'cp-tog' }, l, checkbox('surfaces.' + k, c.surfaces[k]));
     body.append(section('Surfaces'),
       surf('statCards', 'Stat cards'), surf('graph', 'Graph'),
-      surf('balance', 'Balance + Withdraw'), surf('tables', 'Breakdown tables'));
+      surf('balance', 'Balance + Withdraw'), surf('tables', 'Breakdown tables'),
+      surf('payouts', 'Recent payouts'), surf('tabBar', 'Bottom tab bar'));
 
     body.append(el('div', { class: 'cp-actions' },
       el('button', { class: 'cp-btn', onClick: doExport }, 'Export'),
