@@ -58,6 +58,12 @@ function aggregateMonthly(daily) {
 
 // Month → Week → Today cascade. Scaling an inner block only increases the
 // outer blocks' sums, so earlier-fixed deltas can only get more positive.
+// Interactions, by design:
+// - weekendDip: if today is Sat/Sun, the today-nudge can override the dip
+//   (positive hero delta beats weekend realism; use todayDeltaOverride to control).
+// - Uplifted values may exceed the dailyMax*1.5 clamp (reads as a spike day).
+// - Without todayDeltaOverride, a naturally huge today can show a >100% delta;
+//   it stays consistent with the visible 7-day table, so we don't cap it.
 function upliftPositive(days, rng) {
   const out = days.map((d) => ({ ...d }));
   const n = out.length;

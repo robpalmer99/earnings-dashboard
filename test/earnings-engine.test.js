@@ -49,6 +49,7 @@ test('total card sums only the configured window', () => {
 
 test('amounts stay within sane bounds', () => {
   const { daily } = generateEarnings(config, NOW);
+  // Raw generator only: forcePositiveDeltas may legitimately exceed these bounds.
   for (const d of daily) {
     assert.ok(d.amount >= 300 && d.amount <= 1100 * 1.5, `amount ${d.amount}`);
   }
