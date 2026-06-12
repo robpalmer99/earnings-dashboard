@@ -91,9 +91,33 @@ test('weekendDip scales Sat/Sun down vs neighbors', () => {
   for (let i = 0; i < b.daily.length; i++) {
     const dow = new Date(b.daily[i].date + 'T00:00:00Z').getUTCDay();
     if (dow === 0 || dow === 6) {
+      // weekend amounts may fall below dailyMin by design (dip applies after clamp)
       assert.equal(b.daily[i].amount, Math.round(a.daily[i].amount * 0.6 * 100) / 100);
     } else {
       assert.equal(b.daily[i].amount, a.daily[i].amount);
     }
   }
+});
+
+test('forcePositiveDeltas: all deltas positive across many seeds', () => {
+  for (let seed = 1; seed <= 50; seed++) {
+    const c = { data: { ...config.data, seed, forcePositiveDeltas: true, todayDeltaOverride: null } };
+    const { totals } = generateEarnings(c, NOW);
+    assert.ok(totals.today.deltaPct > 0, `seed ${seed} today ${totals.today.deltaPct}`);
+    assert.ok(totals.week.deltaPct > 0, `seed ${seed} week ${totals.week.deltaPct}`);
+    assert.ok(totals.month.deltaPct > 0, `seed ${seed} month ${totals.month.deltaPct}`);
+    assert.ok(totals.week.deltaPct <= 100, `seed ${seed} week too high ${totals.week.deltaPct}`);
+  }
+});
+
+test('forcePositiveDeltas is deterministic and off by default here', () => {
+  const c = { data: { ...config.data, forcePositiveDeltas: true } };
+  assert.deepEqual(generateEarnings(c, NOW), generateEarnings(c, NOW));
+  const raw = generateEarnings(config, NOW);
+  assert.deepEqual(raw, generateEarnings(config, NOW));
+});
+
+test('todayDeltaOverride still wins for the hero card', () => {
+  const c = { data: { ...config.data, forcePositiveDeltas: true, todayDeltaOverride: 27.3 } };
+  assert.equal(generateEarnings(c, NOW).totals.today.deltaPct, 27.3);
 });

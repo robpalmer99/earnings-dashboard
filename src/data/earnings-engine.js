@@ -56,6 +56,32 @@ function aggregateMonthly(daily) {
   return buckets;
 }
 
+// Month → Week → Today cascade. Scaling an inner block only increases the
+// outer blocks' sums, so earlier-fixed deltas can only get more positive.
+function upliftPositive(days, rng) {
+  const out = days.map((d) => ({ ...d }));
+  const n = out.length;
+  const target = () => 0.05 + rng() * 0.35; // +5%..+40%, seeded, never round
+  const block = (from, to) => out.slice(from, to).reduce((s, d) => s + d.amount, 0);
+  const scale = (from, f) => { for (let i = from; i < n; i++) out[i].amount *= f; };
+
+  const prev30 = block(n - 60, n - 30);
+  const last30 = block(n - 30, n);
+  const want30 = prev30 * (1 + target());
+  if (last30 < want30) scale(n - 30, want30 / last30);
+
+  const prev7 = block(n - 14, n - 7);
+  const last7 = block(n - 7, n);
+  const want7 = prev7 * (1 + target());
+  if (last7 < want7) scale(n - 7, want7 / last7);
+
+  const yesterday = out[n - 2].amount;
+  if (out[n - 1].amount <= yesterday) out[n - 1].amount = yesterday * (1 + target());
+
+  for (const d of out) d.amount = round2(d.amount);
+  return out;
+}
+
 function pctDelta(current, previous) {
   if (!previous) return null;
   return round2(((current - previous) / previous) * 100);
@@ -84,7 +110,8 @@ function computeTotals(daily, config) {
 
 export function generateEarnings(config, now) {
   const rng = makeRng(config.data.seed);
-  const daily = generateDaily(rng, config, now);
+  let daily = generateDaily(rng, config, now);
+  if (config.data.forcePositiveDeltas) daily = upliftPositive(daily, rng);
   return {
     daily,
     weekly: aggregateWeekly(daily.slice(-(8 * 7))),
