@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildChart } from '../src/charts/chart-math.js';
+import { buildChart, resample } from '../src/charts/chart-math.js';
 
 const box = { width: 300, height: 100, padding: 10 };
 
@@ -36,4 +36,30 @@ test('empty series returns empty geometry without throwing', () => {
   assert.deepEqual(points, []);
   assert.equal(linePath, '');
   assert.equal(areaPath, '');
+});
+
+test('buildChart linePath is a smooth cubic curve', () => {
+  const series = [{ amount: 1 }, { amount: 5 }, { amount: 2 }, { amount: 8 }];
+  const { linePath } = buildChart(series, { width: 100, height: 50 });
+  assert.ok(linePath.startsWith('M'));
+  assert.equal((linePath.match(/C/g) || []).length, 3); // n-1 cubic segments
+});
+
+test('buildChart with 2 points falls back to a straight line', () => {
+  const { linePath } = buildChart([{ amount: 1 }, { amount: 2 }], { width: 100, height: 50 });
+  assert.ok(linePath.includes('L'));
+  assert.ok(!linePath.includes('C'));
+});
+
+test('areaPath closes under the curve', () => {
+  const series = [{ amount: 1 }, { amount: 5 }, { amount: 2 }];
+  const { areaPath } = buildChart(series, { width: 100, height: 50, padding: 10 });
+  assert.ok(areaPath.endsWith('Z'));
+  assert.ok(areaPath.includes('L'));
+});
+
+test('resample interpolates to the requested length deterministically', () => {
+  assert.deepEqual(resample([0, 10], 3), [0, 5, 10]);
+  assert.deepEqual(resample([1, 2, 3], 3), [1, 2, 3]);
+  assert.equal(resample([4], 3).length, 3);
 });
