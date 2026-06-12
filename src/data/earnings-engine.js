@@ -93,6 +93,22 @@ function pctDelta(current, previous) {
   return round2(((current - previous) / previous) * 100);
 }
 
+// Distinct rng stream (seed offset) so payout history doesn't disturb the series.
+function generatePayouts(config, now) {
+  const count = config.payouts?.count ?? 4;
+  const presets = config.withdraw?.presets || [500, 1000, 1500];
+  const lo = Math.min(...presets) * 0.8;
+  const hi = Math.max(...presets) * 1.15;
+  const rng = makeRng(((config.data.seed >>> 0) + 7919) >>> 0);
+  const rows = [];
+  let date = addDays(now, -(2 + Math.floor(rng() * 4)));
+  for (let i = 0; i < count; i++) {
+    rows.push({ date, amount: round2(lo + rng() * (hi - lo)), status: 'Completed' });
+    date = addDays(date, -(5 + Math.floor(rng() * 8)));
+  }
+  return rows;
+}
+
 function computeTotals(daily, config) {
   const n = daily.length;
   const windowDays = Math.min(config.data.windowDays || n, n);
@@ -124,5 +140,6 @@ export function generateEarnings(config, now) {
     monthly: aggregateMonthly(daily),
     totals: computeTotals(daily, config),
     balance: config.data.balance,
+    payouts: generatePayouts(config, now),
   };
 }

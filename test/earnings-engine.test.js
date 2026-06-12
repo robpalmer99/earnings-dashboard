@@ -122,3 +122,21 @@ test('todayDeltaOverride still wins for the hero card', () => {
   const c = { data: { ...config.data, forcePositiveDeltas: true, todayDeltaOverride: 27.3 } };
   assert.equal(generateEarnings(c, NOW).totals.today.deltaPct, 27.3);
 });
+
+test('payout history: seeded, plausible, newest first', () => {
+  const c = { data: config.data, payouts: { count: 4 }, withdraw: { presets: [500, 1000, 1500] } };
+  const { payouts } = generateEarnings(c, NOW);
+  assert.equal(payouts.length, 4);
+  for (const p of payouts) {
+    assert.ok(p.amount >= 400 && p.amount <= 1725, `amount ${p.amount}`);
+    assert.equal(p.status, 'Completed');
+    assert.ok(p.date < NOW);
+  }
+  for (let i = 1; i < payouts.length; i++) assert.ok(payouts[i].date < payouts[i - 1].date);
+  assert.deepEqual(payouts, generateEarnings(c, NOW).payouts);
+});
+
+test('payout history tolerates missing config groups', () => {
+  const { payouts } = generateEarnings(config, NOW);
+  assert.equal(payouts.length, 4);
+});

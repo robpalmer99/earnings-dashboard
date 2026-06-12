@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { defaultConfig, mergeConfig } from '../src/config/schema.js';
 
 test('defaultConfig has the expected groups', () => {
-  for (const k of ['brand', 'theme', 'locale', 'data', 'surfaces', 'withdraw']) {
+  for (const k of ['brand', 'theme', 'locale', 'data', 'surfaces', 'withdraw', 'payouts']) {
     assert.ok(defaultConfig[k], `missing ${k}`);
   }
 });
