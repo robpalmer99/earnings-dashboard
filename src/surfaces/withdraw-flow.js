@@ -1,6 +1,7 @@
 import { el, clear } from '../lib/dom.js';
 import { formatCurrency } from '../lib/format.js';
 import { createWithdrawMachine, STEPS } from './withdraw-machine.js';
+import { icons } from '../lib/icons.js';
 
 export function mount(root, store) {
   const sheet = el('div', { class: 'wd-sheet' });
@@ -29,7 +30,7 @@ export function mount(root, store) {
     const row = el('div', { class: 'wd-stepper' });
     STEPS.forEach((_, i) => {
       const cls = i < idx ? 'done' : i === idx ? 'active' : 'todo';
-      row.append(el('div', { class: 'wd-node ' + cls }, i < idx ? '✓' : String(i + 1)));
+      row.append(el('div', { class: 'wd-node ' + cls }, i < idx ? icons.check(12) : String(i + 1)));
       if (i < STEPS.length - 1) row.append(el('div', { class: 'wd-seg' + (i < idx ? ' done' : '') }));
     });
     return row;
@@ -46,6 +47,16 @@ export function mount(root, store) {
     sheet.append(stepper(st.step));
 
     if (st.step === 'amount') {
+      const input = el('input', {
+        class: 'wd-input', type: 'text', inputmode: 'decimal', placeholder: '0.00',
+        value: st.amount > 0 ? String(st.amount) : '',
+        onInput: (e) => { machine.setAmount(e.target.value); syncContinue(); },
+      });
+      const cont = el('button', { class: 'btn-accent wd-full', onClick: () => { machine.next(); render(); } }, 'Continue');
+      function syncContinue() {
+        if (machine.getState().amount > 0) cont.removeAttribute('disabled');
+        else cont.setAttribute('disabled', '');
+      }
       const chips = el('div', { class: 'wd-chips' },
         ...[...st.presets.map(String), 'max'].map((k) =>
           el('button', { class: 'wd-chip', onClick: () => { machine.selectPreset(k); render(); } },
@@ -53,17 +64,19 @@ export function mount(root, store) {
       sheet.append(
         el('div', { class: 'wd-h' }, 'Withdraw Funds'),
         el('div', { class: 'wd-sub' }, 'Enter the amount to withdraw to your bank account.'),
-        el('div', { class: 'wd-amount' }, formatCurrency(st.amount, cur)),
+        el('div', { class: 'wd-amount-row' }, el('span', { class: 'wd-cursign' }, formatCurrency(0, cur).replace(/[\d.,\s]/g, '')), input),
         chips,
-        el('div', { class: 'wd-dest' }, '🏦 ' + bank),
-        el('button', { class: 'btn-accent wd-full', onClick: () => { machine.next(); render(); } }, 'Continue'));
+        el('div', { class: 'wd-dest' }, icons.bank(16), ' ' + bank),
+        cont);
+      syncContinue();
+      input.focus();
     } else if (st.step === 'review') {
       sheet.append(
         el('div', { class: 'wd-h' }, 'Review & confirm'),
         rowEl('Amount', formatCurrency(st.amount, cur)),
         rowEl('To', bank),
         rowEl('Fee', formatCurrency(0, cur)),
-        rowEl('Arrival', 'Instant ⚡'),
+        rowEl('Arrival', el('span', {}, 'Instant ', icons.bolt(13))),
         el('button', { class: 'btn-accent wd-full', onClick: () => { machine.next(); render(); timer = setTimeout(() => { machine.next(); render(); }, processingMs); } }, 'Confirm withdrawal'),
         el('button', { class: 'wd-back', onClick: () => { machine.back(); render(); } }, '← Back'));
     } else if (st.step === 'processing') {
@@ -71,11 +84,11 @@ export function mount(root, store) {
         el('div', { class: 'wd-ring' }),
         el('div', { class: 'wd-h center' }, 'Processing your withdrawal…'),
         el('div', { class: 'wd-sub center' }, 'Securely contacting your bank. This only takes a moment.'),
-        el('div', { class: 'wd-secure' }, '🔒 Bank-grade encryption'));
+        el('div', { class: 'wd-secure' }, icons.lock(12), ' Bank-grade encryption'));
     } else {
       sheet.append(
-        el('div', { class: 'wd-check' }, '✓'),
-        el('div', { class: 'wd-h center' }, 'Transfer initiated!'),
+        el('div', { class: 'wd-check' }, icons.check(26)),
+        el('div', { class: 'wd-h center' }, 'Transfer complete!'),
         el('div', { class: 'wd-sub center' }, `${formatCurrency(st.amount, cur)} is on its way to ${bank}.`),
         rowEl('Reference', '#' + st.reference),
         rowEl('Status', el('span', { class: 'wd-ok' }, 'Completed')),

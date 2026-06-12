@@ -1,12 +1,13 @@
 import { el } from '../lib/dom.js';
 import { formatCurrency } from '../lib/format.js';
+import { icons } from '../lib/icons.js';
 
 export function mount(root, store) {
   const amountEl = el('div', { class: 'amount' });
   const btn = el('button', {
     class: 'btn-accent',
     onClick: () => document.dispatchEvent(new CustomEvent('withdraw:open')),
-  }, '↑ Withdraw');
+  }, icons.arrowUp(14), ' Withdraw');
 
   const card = el('div', { class: 'balance' },
     el('div', {},
