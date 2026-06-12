@@ -1,6 +1,7 @@
 import { el, clear } from '../lib/dom.js';
 import { formatCurrency, formatPercent } from '../lib/format.js';
 import { countUp } from '../lib/animate.js';
+import { icons } from '../lib/icons.js';
 
 const CARDS = [
   { key: 'today', label: "Today's Earnings", hero: true },
@@ -22,7 +23,8 @@ export function mount(root, store) {
       const amountEl = el('div', { class: 'amount' }, formatCurrency(t.amount, config.locale));
       const delta = t.deltaPct != null
         ? el('div', { class: 'delta' + (t.deltaPct < 0 ? ' down' : '') },
-            `${t.deltaPct < 0 ? '▼' : '▲'} ${formatPercent(Math.abs(t.deltaPct))} vs prior`)
+            t.deltaPct < 0 ? icons.caretDown(10) : icons.caretUp(10),
+            ` ${formatPercent(Math.abs(t.deltaPct))} vs prior`)
         : el('div', { class: 'delta' }, def.key === 'total' ? 'all-time' : '');
       wrap.append(el('div', { class: 'card' + (def.hero ? ' hero' : '') },
         el('div', { class: 'label' }, def.label), amountEl, delta));
