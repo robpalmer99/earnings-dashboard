@@ -5,6 +5,7 @@ import { generateEarnings } from './data/earnings-engine.js';
 import { applyTheme } from './theme/apply-theme.js';
 import { el, clear } from './lib/dom.js';
 import { isoDate } from './lib/dates.js';
+import { icons } from './lib/icons.js';
 import * as statCards from './surfaces/stat-cards.js';
 import * as balanceCard from './surfaces/balance-card.js';
 import * as recentPayouts from './surfaces/recent-payouts.js';
@@ -42,9 +43,12 @@ function renderBrand() {
   const { brand } = store.getState().config;
   clear(brandbar);
   const logo = brand.logo ? el('img', { class: 'logo', src: brand.logo, alt: '' }) : el('div', { class: 'logo' });
+  const initials = brand.name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('') || 'A';
   brandbar.append(
     el('div', { class: 'brand' }, logo, el('span', {}, brand.name), el('span', { class: 'sub' }, '· ' + brand.subtitle)),
-    el('div', { class: 'avatar' }));
+    el('div', { class: 'brand-right' },
+      el('button', { class: 'bell' }, icons.bell(18), el('span', { class: 'bell-dot' })),
+      el('div', { class: 'avatar' }, initials)));
   document.title = brand.name + ' — ' + brand.subtitle;
 }
 store.subscribe(renderBrand);

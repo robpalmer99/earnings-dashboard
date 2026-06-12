@@ -26,10 +26,19 @@ body {
 .brandbar .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 15px; }
 .brandbar .brand .logo { width: 26px; height: 26px; border-radius: 8px; background: var(--accent); object-fit: cover; }
 .brandbar .brand .sub { font-weight: 500; font-size: 12px; color: var(--ink-mute); }
-.brandbar .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--line); }
+.brandbar .brand-right { display: flex; align-items: center; gap: 10px; }
+.brandbar .bell { position: relative; background: none; border: none; color: var(--ink-soft); cursor: pointer; padding: 4px; display: flex; }
+.brandbar .bell-dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); border: 1.5px solid var(--surface); }
+.brandbar .avatar {
+  width: 30px; height: 30px; border-radius: 50%; background: var(--accent);
+  color: var(--accent-contrast); font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; letter-spacing: 0.02em;
+}
 
-.page-title { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 16px; }
+.page-title { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 2px; }
 @media (min-width: 720px) { .page-title { font-size: 28px; } }
+
+.page-meta { font-size: 11px; color: var(--ink-mute); margin-bottom: 16px; }
 
 .hidden { display: none !important; }
 
