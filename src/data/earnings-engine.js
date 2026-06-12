@@ -38,6 +38,7 @@ function aggregateWeekly(daily) {
 function aggregateMonthly(daily) {
   // Six complete trailing 30-day buckets ending today. Complete buckets only —
   // the calendar-month "partial month crash" is structurally impossible.
+  // Note: 'month' reflects the bucket's END date; buckets may cross calendar months.
   const buckets = [];
   for (let k = 5; k >= 0; k--) {
     const end = daily.length - k * 30;
@@ -79,7 +80,7 @@ export function generateEarnings(config, now) {
   const daily = generateDaily(rng, config, now);
   return {
     daily,
-    weekly: aggregateWeekly(daily.slice(-56)),
+    weekly: aggregateWeekly(daily.slice(-(8 * 7))),
     monthly: aggregateMonthly(daily),
     totals: computeTotals(daily, config),
     balance: config.data.balance,
