@@ -35,7 +35,7 @@ const controller = {
   resetConfig() {
     applyTheme(defaultConfig);
     saveConfig(defaultConfig);
-    store.setState(build(defaultConfig));
+    store.setState({ ...build(defaultConfig), session: { payouts: [] } });
   },
 };
 

@@ -81,7 +81,7 @@ export function mount(root, controller) {
       field('Window (days)', number('data.windowDays', c.data.windowDays, 1)),
       field('Seed', number('data.seed', c.data.seed, 1)),
       field('Available balance', number('data.balance', c.data.balance, 1)),
-      field('Hero "Today" %', number('data.todayDeltaOverride', c.data.todayDeltaOverride, 0.1)),
+      field('Hero "Today" %', number('data.todayDeltaOverride', c.data.todayDeltaOverride ?? '', 0.1)),
       field('Always-positive deltas', checkbox('data.forcePositiveDeltas', c.data.forcePositiveDeltas)),
       field('Weekend dip', checkbox('data.weekendDip', c.data.weekendDip)));
 
