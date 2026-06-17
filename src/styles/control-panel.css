@@ -19,3 +19,10 @@
 .cp-actions { display: flex; gap: 6px; margin-top: 16px; }
 .cp-btn { flex: 1; font: inherit; font-size: 12px; font-weight: 700; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); cursor: pointer; }
 .cp-btn:hover { border-color: var(--accent); }
+.cp-ver-save { width: 100%; margin-bottom: 8px; }
+.cp-empty { font-size: 12px; color: var(--ink-mute); padding: 4px 0; }
+.cp-ver { border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-bottom: 6px; }
+.cp-ver-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+.cp-ver-name { font-size: 13px; font-weight: 700; }
+.cp-ver-date { font-size: 10px; color: var(--ink-mute); }
+.cp-ver-acts { display: flex; gap: 6px; }
