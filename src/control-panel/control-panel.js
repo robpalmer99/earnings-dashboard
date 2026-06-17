@@ -1,6 +1,9 @@
 import { el, clear } from '../lib/dom.js';
 import { presets } from '../config/presets.js';
 import { exportConfig, importConfig } from '../config/persistence.js';
+import { listVersions, saveVersion, loadVersion, deleteVersion } from '../config/versions.js';
+import { formatDateShort } from '../lib/format.js';
+import { isoDate } from '../lib/dates.js';
 
 export function mount(root, controller) {
   const body = el('div', { class: 'cp-body' });
@@ -96,6 +99,10 @@ export function mount(root, controller) {
       surf('balance', 'Balance + Withdraw'), surf('tables', 'Breakdown tables'),
       surf('payouts', 'Recent payouts'), surf('tabBar', 'Bottom tab bar'));
 
+    body.append(section('Versions'),
+      el('button', { class: 'cp-btn cp-ver-save', onClick: doSaveVersion }, 'Save current as version…'),
+      renderVersions());
+
     body.append(el('div', { class: 'cp-actions' },
       el('button', { class: 'cp-btn', onClick: doExport }, 'Export'),
       el('button', { class: 'cp-btn', onClick: doImport }, 'Import'),
@@ -115,6 +122,53 @@ export function mount(root, controller) {
       catch (err) { alert(err.message); }
     });
     input.click();
+  }
+
+  function renderVersions() {
+    const list = listVersions();
+    const wrap = el('div', { class: 'cp-versions' });
+    if (!list.length) {
+      wrap.append(el('div', { class: 'cp-empty' }, 'No saved versions yet.'));
+      return wrap;
+    }
+    for (const v of list) {
+      wrap.append(el('div', { class: 'cp-ver' },
+        el('div', { class: 'cp-ver-head' },
+          el('span', { class: 'cp-ver-name' }, v.name),
+          el('span', { class: 'cp-ver-date' }, formatDateShort(isoDate(new Date(v.savedAt))))),
+        el('div', { class: 'cp-ver-acts' },
+          el('button', { class: 'cp-btn', onClick: () => doLoad(v) }, 'Load'),
+          el('button', { class: 'cp-btn', onClick: () => doDelete(v) }, 'Delete'))));
+    }
+    return wrap;
+  }
+
+  function doSaveVersion() {
+    const name = (window.prompt('Name this version:') || '').trim();
+    if (!name) return;
+    const exists = listVersions().some((v) => v.name === name);
+    if (exists && !window.confirm(`Overwrite the existing version "${name}"?`)) return;
+    try {
+      saveVersion(name, controller.getConfig());
+    } catch {
+      alert('Could not save version (storage full or unavailable).');
+      return;
+    }
+    rebuild();
+  }
+
+  function doLoad(v) {
+    if (!window.confirm(`Load "${v.name}"? This replaces the current setup.`)) return;
+    const cfg = loadVersion(v.id);
+    if (!cfg) { alert('Version not found.'); rebuild(); return; }
+    controller.applyConfig(cfg);
+    rebuild();
+  }
+
+  function doDelete(v) {
+    if (!window.confirm(`Delete "${v.name}"?`)) return;
+    deleteVersion(v.id);
+    rebuild();
   }
 
   return { open, close };
