@@ -30,12 +30,16 @@ const controller = {
     saveConfig(config);
     store.setState(build(config));
   },
-  // True reset: set the default config directly (not a merge), so stray keys from a
-  // previously imported config can't survive a reset.
+  // Full replace: set config directly (not a merge) and clear session state, so
+  // stray keys from a previously loaded config can't survive. Used to load a saved
+  // version and to reset.
+  applyConfig(config) {
+    applyTheme(config);
+    saveConfig(config);
+    store.setState({ ...build(config), session: { payouts: [] } });
+  },
   resetConfig() {
-    applyTheme(defaultConfig);
-    saveConfig(defaultConfig);
-    store.setState({ ...build(defaultConfig), session: { payouts: [] } });
+    this.applyConfig(defaultConfig);
   },
 };
 
