@@ -21,13 +21,16 @@ test('control panel opens and re-skins live', async ({ page }) => {
   await expect(page.locator('.brandbar .brand')).toContainText('Acme Capital');
 });
 
-test('randomize re-rolls the stats', async ({ page }) => {
+test('randomize re-rolls the stats and the balance', async ({ page }) => {
   await page.goto('/');
   const hero = page.locator('.card.hero .amount');
-  const before = await hero.textContent();
+  const balance = page.locator('.balance .amount');
+  const heroBefore = await hero.textContent();
+  const balanceBefore = await balance.textContent();
   await page.keyboard.press('Control+k');
   await page.locator('.cp-actions button', { hasText: 'Randomize' }).click();
-  await expect(hero).not.toHaveText(before);
+  await expect(hero).not.toHaveText(heroBefore);
+  await expect(balance).not.toHaveText(balanceBefore);
 });
 
 test('withdraw flow reaches completion', async ({ page }) => {

@@ -21,7 +21,8 @@ export const defaultConfig = {
     volatility: 0.2,
     windowDays: 60,
     seed: 42,
-    balance: 4401.86,
+    balance: null, // null = auto-derive from earnings (varies on Randomize); a number overrides
+
     todayDeltaOverride: 27.3,
     forcePositiveDeltas: true,
     weekendDip: false,

@@ -10,7 +10,9 @@ test('no red deltas with default config', async ({ page }) => {
 
 test('typed withdrawal: disabled continue, balance drops, payout row appears', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.balance .amount')).toHaveText('$4,401.86');
+  const amount = page.locator('.balance .amount');
+  const parse = async () => Number((await amount.textContent()).replace(/[^0-9.]/g, ''));
+  const before = await parse();
   await page.click('.balance .btn-accent');
   const cont = page.locator('button:has-text("Continue")');
   await expect(cont).toBeDisabled();
@@ -20,7 +22,7 @@ test('typed withdrawal: disabled continue, balance drops, payout row appears', a
   await page.click('button:has-text("Confirm withdrawal")');
   await expect(page.locator('text=Transfer complete!')).toBeVisible({ timeout: 10000 });
   await page.click('button:has-text("Done")');
-  await expect(page.locator('.balance .amount')).toHaveText('$3,651.86');
+  expect(await parse()).toBeCloseTo(before - 750, 2);
   await expect(page.locator('.payouts .p-row').first()).toContainText('Just now');
 });
 

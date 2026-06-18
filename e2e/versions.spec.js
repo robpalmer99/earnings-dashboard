@@ -11,6 +11,7 @@ test('save a version, change a setting, load it back', async ({ page }) => {
   await page.waitForTimeout(1100);
   const hero = page.locator('.card.hero .amount');
   const heroBefore = await hero.textContent();
+  const balanceBefore = await page.locator('.balance .amount').textContent();
 
   // Open the panel and save the current config as a version.
   await page.keyboard.press('Control+k');
@@ -24,6 +25,6 @@ test('save a version, change a setting, load it back', async ({ page }) => {
 
   // Load the saved version back; the balance and hero revert to the snapshot.
   await page.locator('.cp-ver', { hasText: 'Test Version' }).locator('.cp-btn', { hasText: 'Load' }).click();
-  await expect(page.locator('.balance .amount')).toHaveText('$4,401.86');
+  await expect(page.locator('.balance .amount')).toHaveText(balanceBefore);
   await expect(hero).toHaveText(heroBefore);
 });

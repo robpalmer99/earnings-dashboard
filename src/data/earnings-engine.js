@@ -96,6 +96,19 @@ function upliftPositive(days, rng) {
   return out;
 }
 
+// Available balance: an explicit override when config.data.balance is set,
+// otherwise a believable "few days of recent earnings, cleared and ready to
+// withdraw" figure derived from the series — so it tracks the seed (varies on
+// Randomize) and stays coherent with the daily numbers on screen. Own rng stream
+// (seed offset) so it doesn't disturb the data series.
+function resolveBalance(config, daily) {
+  const override = config.data.balance;
+  if (override != null) return override;
+  const avgDaily = sum(daily.slice(-7)) / 7;
+  const rng = makeRng(((config.data.seed >>> 0) + 104729) >>> 0);
+  return round2(avgDaily * (3 + rng() * 4)); // 3..7 days' worth
+}
+
 function pctDelta(current, previous) {
   if (!previous) return null;
   return round2(((current - previous) / previous) * 100);
@@ -147,7 +160,7 @@ export function generateEarnings(config, now) {
     weekly: aggregateWeekly(daily.slice(-(8 * 7))),
     monthly: aggregateMonthly(daily),
     totals: computeTotals(daily, config),
-    balance: config.data.balance,
+    balance: resolveBalance(config, daily),
     payouts: generatePayouts(config, now),
   };
 }

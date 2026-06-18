@@ -81,9 +81,21 @@ test('hero today delta override is honored', () => {
   assert.equal(totals.today.deltaPct, 27.3);
 });
 
-test('balance passes through from config', () => {
-  const { balance } = generateEarnings(config, NOW);
+test('balance: explicit override is used as-is', () => {
+  const { balance } = generateEarnings(config, NOW); // config sets balance 4401.86
   assert.equal(balance, 4401.86);
+});
+
+test('balance: auto-derives from earnings when unset, and tracks the seed', () => {
+  const auto = { data: { ...config.data, balance: null } };
+  const a = generateEarnings(auto, NOW).balance;
+  const b = generateEarnings({ data: { ...auto.data, seed: 99 } }, NOW).balance;
+  assert.ok(a > 0, `derived balance ${a}`);
+  assert.notEqual(a, b); // varies on Randomize (a seed change)
+  // coherent with the daily scale: 3..7 days of recent earnings
+  const { daily } = generateEarnings(auto, NOW);
+  const avg = daily.slice(-7).reduce((s, d) => s + d.amount, 0) / 7;
+  assert.ok(a >= avg * 3 && a <= avg * 7, `balance ${a} outside 3..7 day band (avg ${avg})`);
 });
 
 test('weekly and monthly aggregates exist', () => {

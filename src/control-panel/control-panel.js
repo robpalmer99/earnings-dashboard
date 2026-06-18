@@ -83,7 +83,13 @@ export function mount(root, controller) {
       field('Volatility (0…1)', range('data.volatility', c.data.volatility, 0, 1, 0.05)),
       field('Window (days)', number('data.windowDays', c.data.windowDays, 1)),
       field('Seed', number('data.seed', c.data.seed, 1)),
-      field('Available balance', number('data.balance', c.data.balance, 1)),
+      field('Available balance', el('input', { class: 'cp-inp', type: 'number', step: 1,
+        placeholder: 'Auto (from earnings)', value: c.data.balance ?? '',
+        onInput: (e) => {
+          if (e.target.value === '') { controller.setConfig(patch('data.balance', null)); return; }
+          const n = Number(e.target.value);
+          if (Number.isFinite(n)) controller.setConfig(patch('data.balance', n));
+        } })),
       field('Hero "Today" %', number('data.todayDeltaOverride', c.data.todayDeltaOverride ?? '', 0.1)),
       field('Always-positive deltas', checkbox('data.forcePositiveDeltas', c.data.forcePositiveDeltas)),
       field('Weekend dip', checkbox('data.weekendDip', c.data.weekendDip)));
