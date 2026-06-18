@@ -119,8 +119,10 @@ export function mount(root, controller) {
   // Re-roll the seed to a fresh random value: keeps every other setting, but the
   // deterministic engine produces a brand-new-looking set of stats. This is the
   // "give me different numbers" action (Reset, by contrast, restores defaults).
+  // Also clears any balance override (back to auto) so the withdraw amount
+  // re-rolls too — otherwise a pinned/persisted balance stays frozen.
   function doRandomize() {
-    controller.setConfig(patch('data.seed', Math.floor(Math.random() * 1e9)));
+    controller.setConfig({ data: { seed: Math.floor(Math.random() * 1e9), balance: null } });
     rebuild();
   }
 

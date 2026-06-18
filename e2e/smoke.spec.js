@@ -25,12 +25,16 @@ test('randomize re-rolls the stats and the balance', async ({ page }) => {
   await page.goto('/');
   const hero = page.locator('.card.hero .amount');
   const balance = page.locator('.balance .amount');
-  const heroBefore = await hero.textContent();
-  const balanceBefore = await balance.textContent();
   await page.keyboard.press('Control+k');
+  // Pin a manual balance override first — Randomize must still re-roll it,
+  // otherwise a persisted balance stays frozen while the stats change.
+  const balInput = page.locator('.cp-field', { hasText: 'Available balance' }).locator('input');
+  await balInput.fill('4401.86');
+  await expect(balance).toHaveText('$4,401.86');
+  const heroBefore = await hero.textContent();
   await page.locator('.cp-actions button', { hasText: 'Randomize' }).click();
   await expect(hero).not.toHaveText(heroBefore);
-  await expect(balance).not.toHaveText(balanceBefore);
+  await expect(balance).not.toHaveText('$4,401.86');
 });
 
 test('withdraw flow reaches completion', async ({ page }) => {
