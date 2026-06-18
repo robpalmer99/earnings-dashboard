@@ -21,7 +21,7 @@ function generateDaily(rng, config, now) {
     const base = dailyMin + rng() * (dailyMax - dailyMin);
     const noise = 1 + (rng() - 0.5) * 2 * volatility;
     let amount = base * trendFactor * noise;
-    amount = Math.max(dailyMin, Math.min(dailyMax * 1.5, amount));
+    amount = Math.max(dailyMin, Math.min(dailyMax, amount));
     amount = round2(amount);
     if (weekendDip && isWeekend(date)) amount = round2(amount * 0.6);
     days.push({ date, amount });
@@ -56,33 +56,41 @@ function aggregateMonthly(daily) {
   return buckets;
 }
 
-// Month → Week → Today cascade. Scaling an inner block only increases the
-// outer blocks' sums, so earlier-fixed deltas can only get more positive.
-// Interactions, by design:
-// - weekendDip: if today is Sat/Sun, the today-nudge can override the dip
-//   (positive hero delta beats weekend realism; use todayDeltaOverride to control).
-// - Uplifted values may exceed the dailyMax*1.5 clamp (reads as a spike day).
-// - Without todayDeltaOverride, a naturally huge today can show a >100% delta;
-//   it stays consistent with the visible 7-day table, so we don't cap it.
+// Force the recent periods to out-earn the prior ones to keep every delta
+// positive — but WITHOUT lifting any day above the hard dailyMax ceiling. Rather
+// than inflate the recent block (which would breach the cap, e.g. a $1,941 "today"
+// against a $1,100 max), we deflate the *baseline* block each period is compared
+// against. Since we only ever scale values down, nothing can exceed dailyMax.
+// Tells a clean "ramped up to the ceiling" story. Order today→week→month so each
+// step reads the already-adjusted series; the three baseline ranges don't overlap
+// (prev7, prev30, and the yesterday nudge touch disjoint days).
+// By design:
+// - weekendDip: a Sat/Sun "yesterday" gets nudged below today, so the positive
+//   hero delta can override the weekend dip (use todayDeltaOverride to control).
+// - Deflated baselines may dip below dailyMin (reads as an early ramp-up day).
+// - A naturally huge recent period can still show a >100% delta; it stays
+//   consistent with the visible tables, so we leave it.
 function upliftPositive(days, rng) {
   const out = days.map((d) => ({ ...d }));
   const n = out.length;
-  const target = () => 0.05 + rng() * 0.35; // +5%..+40%, seeded, never round
+  const margin = () => 0.05 + rng() * 0.35; // recent leads baseline by +5%..+40%, seeded
   const block = (from, to) => out.slice(from, to).reduce((s, d) => s + d.amount, 0);
-  const scale = (from, f) => { for (let i = from; i < n; i++) out[i].amount *= f; };
+  const deflate = (from, to, f) => { for (let i = from; i < to; i++) out[i].amount *= f; };
 
-  const prev30 = block(n - 60, n - 30);
-  const last30 = block(n - 30, n);
-  const want30 = prev30 * (1 + target());
-  if (last30 < want30) scale(n - 30, want30 / last30);
+  // Today: if it isn't already above yesterday, dip yesterday just below it.
+  if (out[n - 1].amount <= out[n - 2].amount) out[n - 2].amount = out[n - 1].amount / (1 + margin());
 
-  const prev7 = block(n - 14, n - 7);
+  // Week: deflate prev-7 so last-7 leads it by the margin.
   const last7 = block(n - 7, n);
-  const want7 = prev7 * (1 + target());
-  if (last7 < want7) scale(n - 7, want7 / last7);
+  const prev7 = block(n - 14, n - 7);
+  const cap7 = last7 / (1 + margin());
+  if (prev7 > cap7) deflate(n - 14, n - 7, cap7 / prev7);
 
-  const yesterday = out[n - 2].amount;
-  if (out[n - 1].amount <= yesterday) out[n - 1].amount = yesterday * (1 + target());
+  // Month: deflate prev-30 so last-30 leads it by the margin.
+  const last30 = block(n - 30, n);
+  const prev30 = block(n - 60, n - 30);
+  const cap30 = last30 / (1 + margin());
+  if (prev30 > cap30) deflate(n - 60, n - 30, cap30 / prev30);
 
   for (const d of out) d.amount = round2(d.amount);
   return out;

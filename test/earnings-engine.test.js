@@ -49,9 +49,18 @@ test('total card sums only the configured window', () => {
 
 test('amounts stay within sane bounds', () => {
   const { daily } = generateEarnings(config, NOW);
-  // Raw generator only: forcePositiveDeltas may legitimately exceed these bounds.
+  // Raw generator: dailyMax is a hard ceiling.
   for (const d of daily) {
-    assert.ok(d.amount >= 300 && d.amount <= 1100 * 1.5, `amount ${d.amount}`);
+    assert.ok(d.amount >= 300 && d.amount <= 1100, `amount ${d.amount}`);
+  }
+});
+
+test('dailyMax is a hard ceiling even with forcePositiveDeltas', () => {
+  for (let seed = 1; seed <= 50; seed++) {
+    const c = { data: { ...config.data, seed, forcePositiveDeltas: true } };
+    const { daily, totals } = generateEarnings(c, NOW);
+    for (const d of daily) assert.ok(d.amount <= 1100, `seed ${seed} ${d.date} amount ${d.amount}`);
+    assert.ok(totals.today.amount <= 1100, `seed ${seed} today ${totals.today.amount}`);
   }
 });
 
