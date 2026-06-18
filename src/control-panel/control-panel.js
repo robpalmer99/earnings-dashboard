@@ -104,9 +104,18 @@ export function mount(root, controller) {
       renderVersions());
 
     body.append(el('div', { class: 'cp-actions' },
+      el('button', { class: 'cp-btn', onClick: doRandomize }, 'Randomize'),
       el('button', { class: 'cp-btn', onClick: doExport }, 'Export'),
       el('button', { class: 'cp-btn', onClick: doImport }, 'Import'),
       el('button', { class: 'cp-btn', onClick: () => { controller.resetConfig(); rebuild(); } }, 'Reset')));
+  }
+
+  // Re-roll the seed to a fresh random value: keeps every other setting, but the
+  // deterministic engine produces a brand-new-looking set of stats. This is the
+  // "give me different numbers" action (Reset, by contrast, restores defaults).
+  function doRandomize() {
+    controller.setConfig(patch('data.seed', Math.floor(Math.random() * 1e9)));
+    rebuild();
   }
 
   function doExport() {
